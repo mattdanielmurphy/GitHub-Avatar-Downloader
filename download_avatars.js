@@ -1,6 +1,9 @@
-var request = require('request');
-var token = require('./secrets');
-var fs = require('fs');
+const request = require('request');
+const token = require('./secrets');
+const fs = require('fs');
+
+const arg1 = process.argv[2];
+const arg2 = process.argv[3];
 
 console.log('Welcome to the GitHub Avatar Downloader!');
 
@@ -24,16 +27,19 @@ function downloadImageByURL(url, filePath) {
 		.pipe(fs.createWriteStream(filePath))
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
-	console.log("Errors:", err);
-	let parsedResult = JSON.parse(result);
-	for (var i in parsedResult) {
-		if (parsedResult[i]['avatar_url']) {
-			let loginName = parsedResult[i]['login'];
-			let avatarPath = `avatars/${loginName}.jpg`;
-			let avatarURL = parsedResult[i]['avatar_url'];
-			// console.log(avatarPath);
-			downloadImageByURL(avatarURL, avatarPath);
+getRepoContributors(arg1, arg2, function(err, result) {
+	if((arg1 && arg2) !== undefined) {
+		console.log("Errors:", err);
+		let parsedResult = JSON.parse(result);
+		for (var i in parsedResult) {
+			if (parsedResult[i]['avatar_url']) {
+				let loginName = parsedResult[i]['login'];
+				let avatarPath = `avatars/${loginName}.jpg`;
+				let avatarURL = parsedResult[i]['avatar_url'];
+				downloadImageByURL(avatarURL, avatarPath);
+			}
 		}
+	} else {
+		console.log('Error: You must provide two arguments via console.');
 	}
 });
